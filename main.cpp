@@ -31,10 +31,10 @@ MinMaxResult max(vector<vector<int> > board) {
 
 	if (has_victory(board)) {
 	//	cout << "VICTORY" << endl;
-		return (MinMaxResult){{0, 0}, 10};
+		return (MinMaxResult){{0, 0}, 20};
 	} else if (has_loss(board)) {
 	//	cout << "LOSS" << endl;
-		return (MinMaxResult){{0, 0}, -10};
+		return (MinMaxResult){{0, 0}, -20};
 	} else if (has_tied(board)) {
 	//	cout << "TIE" << endl;
 		return (MinMaxResult){{0, 0}, -1};
@@ -47,18 +47,21 @@ MinMaxResult max(vector<vector<int> > board) {
 		results[i].resize(3);
 	}
 
+	// Check all possible moves
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			if (fboard[i][j] == 0) {
 				fboard[i][j] = 1;
 				results[i][j] = min(fboard).result;
+				if (results[i][j] > 0) results[i][j] -= 1;
 				fboard[i][j] = 0;
 			}
 		}
 	}
 
-	MinMaxResult bestResult = {{0, 0}, -20};
+	MinMaxResult bestResult = {{0, 0}, -30};
 
+	// Select the move with the max final result
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			if (results[i][j] > bestResult.result && results[i][j] != 0 && results[i][j] != 1 && results[i][j] != 2) {
@@ -76,10 +79,10 @@ MinMaxResult min(vector<vector<int> > board) {
 
 	if (has_victory(board)) {
 	//	cout << "VICTORY" << endl;
-		return (MinMaxResult){{0, 0}, 10};
+		return (MinMaxResult){{0, 0}, 20};
 	} else if (has_loss(board)) {
 	//	cout << "LOSS" << endl;
-		return (MinMaxResult){{0, 0}, -10};
+		return (MinMaxResult){{0, 0}, -20};
 	} else if (has_tied(board)) {
 	//	cout << "TIE" << endl;
 		return (MinMaxResult){{0, 0}, -1};
@@ -92,18 +95,21 @@ MinMaxResult min(vector<vector<int> > board) {
 		results[i].resize(3);
 	}
 
+	// Check all possible moves
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			if (fboard[i][j] == 0) {
 				fboard[i][j] = 2;
 				results[i][j] = max(fboard).result;
+				if (results[i][j] < 0) results[i][j] += 1;
 				fboard[i][j] = 0;
 			}
 		}
 	}
 
-	MinMaxResult bestResult = {{0, 0}, 20};
+	MinMaxResult bestResult = {{0, 0}, 30};
 
+	// Select the move with the min final result
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			if (results[i][j] < bestResult.result && results[i][j] != 0 && results[i][j] != 1 && results[i][j] != 2) {
@@ -210,6 +216,7 @@ void printBoard(vector<vector<int> > board) {
 int main() {
 	vector<vector<int> > board(3);
 
+	// Initialize board
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 			board[i].push_back(0);
@@ -218,23 +225,22 @@ int main() {
 
 	Move playerMove;
 
+	// Game loop
 	while (!has_victory(board) && !has_loss(board) && !has_tied(board)) {
+		// Get and do player move
 		printBoard(board);
-
 		do {
 			cout << "Your move: ";
 			cin >> playerMove.x >> playerMove.y;
 		} while (!moveIsValid(playerMove, board));
-
 		board[playerMove.x][playerMove.y] = 2;
 
+		// Check for game over
 		if (has_loss(board) || has_tied(board))
 			break;
 
+		// Calculate and do computer move
 		Move computerMove = minmax(board);
-
-		cout << "Best move: x: " << computerMove.x << " y: " << computerMove.y << endl;
-
 		board[computerMove.x][computerMove.y] = 1;
 	}
 
